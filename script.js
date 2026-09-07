@@ -89,6 +89,9 @@
     localStorage.setItem('theme', newTheme);
     var toggleButton = document.querySelector('.dark-mode-toggle');
     setThemeToggleIcon(toggleButton, newTheme);
+    if (typeof window.Cal !== 'undefined') {
+      window.Cal('ui', { theme: newTheme });
+    }
   }
 
   /* ==========================================================================
@@ -595,7 +598,7 @@
         var data = await response.json();
 
         if (data.success) {
-          result.textContent = 'Request sent! I\'ll get back to you soon.';
+          result.textContent = 'Message sent! I\'ll get back to you within 24 hours.';
           result.className = 'form-result success';
           form.reset();
         } else {
@@ -684,6 +687,39 @@
     }, 5000);
   }
 
+  function initializeCalBooking() {
+    if (typeof window.Cal !== 'undefined') {
+      var currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      window.Cal('ui', {
+        theme: currentTheme,
+        styles: { branding: { brandColor: '#1B2A4A' } },
+        hideEventTypeDetails: false,
+        layout: 'month_view'
+      });
+    }
+
+    var bookingTriggers = document.querySelectorAll('[data-cal-open]');
+    bookingTriggers.forEach(function (trigger) {
+      trigger.addEventListener('click', function (e) {
+        e.preventDefault();
+        var calLink = trigger.getAttribute('data-cal-open') || 'fahmid-hasan-taohid-n2y05r/15min';
+        if (typeof window.Cal !== 'undefined') {
+          var currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+          window.Cal('ui', {
+            theme: currentTheme,
+            styles: { branding: { brandColor: '#1B2A4A' } }
+          });
+          window.Cal('modal', {
+            calLink: calLink,
+            config: { layout: 'month_view' }
+          });
+        } else {
+          window.open('https://cal.com/' + calLink, '_blank', 'noopener,noreferrer');
+        }
+      });
+    });
+  }
+
   /* ==========================================================================
      Initialization
      ========================================================================== */
@@ -700,6 +736,7 @@
     initializeEasterEgg();
     initializeSubtitleSlider();
     initializeFaqAccordions();
+    initializeCalBooking();
 
     window.addEventListener('scroll', throttle(updateProgressBar, 50));
   });
